@@ -5,6 +5,7 @@ import { UserDocument } from '../types/user.interface';
 import { Error } from 'mongoose'; //ValidationError is a class in mongoose that we can use to check if the error is a validation error
 import jwt from 'jsonwebtoken';
 import { secret as secretOrPrivateKey } from '../config'; //import secretOrPrivateKey from config.ts
+
 //user object with Id and validate password method in user.interface.ts
 const normalizeUser = (user: UserDocument) => {
     //id is sufficient to identify a user, but email are useful for display
