@@ -1,44 +1,48 @@
-import { Schema, model } from 'mongoose';
-import { UserDocument } from '../types/user.interface';
-import validator from 'validator';
-import bcryptjs from 'bcryptjs';
+import { Schema, model } from "mongoose";
+import { UserDocument } from "../types/user.interface";
+import validator from "validator";
+import bcryptjs from "bcryptjs";
 
-const userSchema = new Schema<UserDocument>({
+const userSchema = new Schema<UserDocument>(
+  {
     email: {
-        type: String,
-        required: [true, "Email is required"], // custom falsey message
-        validate: [validator.isEmail, "Invalid email"], // validator is a library that checks 
-        createIndexes: { unique: true }, // unique: true, // primary key
+      type: String,
+      required: [true, "Email is required"],
+      validate: [validator.isEmail, "invalid email"],
+      createIndexes: { unique: true },
     },
     username: {
-        type: String,
-        required: [true, "Username is required"],
+      type: String,
+      required: [true, "Username is required"],
     },
     password: {
-        type: String,
-        required: [true, "Password is required"],
-        select: false, // don't return password
+      type: String,
+      required: [true, "Password is required"],
+      select: false,
     },
-},
-    {
-        timestamps: true // createdAt, updatedAt
-    }
+  },
+  {
+    timestamps: true,
+  }
 );
-//pre is a middleware that runs before the save method is called
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) { //check if password was changed
-        return next();
-    }
-    try { //salt is a random string that is used to hash the password e.g. password + salt = hash
-        const salt = await bcryptjs.genSalt(10); // 10 is the number of rounds to generate the salt
-        this.password = await bcryptjs.hash(this.password, salt);
-    } catch (err) {
-        return next(err as Error); // cast to Error since type is unknown
-    }
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  try {
+    const salt = await bcryptjs.genSalt(10);
+    this.password = await bcryptjs.hash(this.password, salt);
+    return next();
+  } catch (err) {
+    return next(err as Error);
+  }
 });
-//methods is a property of mongoose that allows us to add custom methods to our schema
-userSchema.methods.validatePassword = async function (password: string): Promise<boolean> {
-    return await bcryptjs.compare(password, this.password);
+
+userSchema.methods.validatePassword = function (password: string) {
+  console.log("validatePassword", password, this);
+  return bcryptjs.compare(password, this.password);
 };
 
-export default model<UserDocument>('User', userSchema);
+export default model<UserDocument>("User", userSchema);

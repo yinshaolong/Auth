@@ -1,12 +1,12 @@
-import { Document } from 'mongoose';
+import { Document } from "mongoose";
 
 export interface User {
-    email: string; // what we use for validation/ send email
-    username: string;
-    password: string; //will be hashed
-    createdAt: Date; // part of mongoose
+  email: string;
+  username: string;
+  password: string;
+  createdAt: Date;
 }
 
 export interface UserDocument extends User, Document {
-    validatePassword(password: string): string;
+  validatePassword(param1: string): Promise<boolean>;
 }
